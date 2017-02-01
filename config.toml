@@ -1,0 +1,64 @@
+title = "Valérian Rousset"
+subtitle = "creative, logical, social"
+
+profile = """\
+	Software engineer (BSc in computer science) used to work on results-oriented projects, \
+        in any programming language, \
+        with focus on code quality, UNIX philosophy and standard-compliance\
+"""
+
+[competences]
+_ = [
+    "Proven software design and coding skills",
+    "Social in the workplace, building relationships",
+    "Very fast understanding of concepts",
+    "Team worker as well as autonomous",
+    "Reliable and predictable",
+    "Customer-oriented and convincing",
+]
+
+["professional curriculum"]
+"2016" = """\
+        _Nagravision SA (Kudelski Security)_, trainee; \
+        built vulnerability scanner aggregator to increase productivity of security specialists; \
+        used Python, Celery, Elastic, Django; wrote own open-source libraries when needed\
+"""
+"2013 – 2017" = """\
+	_EPFL (Swiss Federal Institute of Technology)_, teaching assistant for \
+        several courses, including Software Engineering and Object-oriented Programming\
+"""
+
+["diplomas"]
+"2016 – 2018" = """\
+        _Master_ in Computer Science (in progress)\
+"""
+"2012 – 2016" = """\
+        _Bachelor_ in Computer Science, EPFL; \
+        average : 5/6, Computer Science : 5.5/6\
+"""
+"2008 – 2012" = """\
+	_Swiss Maturity Diploma, Economy and Law major_, \
+	École Moser and Gymnase, Nyon, Switzerland; \
+        average : 5/6, math : 6/6 (written), French : 6/6 (oral)\
+"""
+
+["computer science skills"]
+"Operating systems" = "_Linux_ (Gentoo, Debian, Ubuntu)"
+"Programming languages" = """\
+	_C++_ (advanced), _C_ (advanced), \
+	_Python_ (advanced), Java (confirmed, studied at EPFL), \
+	Bash (advanced), Scala (practiced, Odersky's course : 5.5/6), \
+	JavaScript (practiced)"""
+
+[languages]
+"Mother tongue" = "_French_, C2, native speaker"
+"Foreign languages" = """\
+	_English_, B2, easy communication
+	_German_, B1, understanding of basic discussions"""
+
+[contact]
+Address = "Rue du Midi 1, 1003 Lausanne, Switzerland"
+
+Telephone = "+41 77 463 50 14"
+Email = "valerian.rousset@gmail.com"
+Citizenships = "Swiss, French"
