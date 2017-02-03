@@ -1,5 +1,10 @@
 title = "Valérian Rousset"
 subtitle = "creative, logical, social"
+urls = [
+	"valerian.rousset@gmail.com",
+	"github.com/tharvik",
+	"linkedin.com/in/valerianrousset",
+]
 
 profile = """\
 	Software engineer (BSc in computer science) used to work on results-oriented projects, \
@@ -61,4 +66,3 @@ Address = "Rue du Midi 1, 1003 Lausanne, Switzerland"
 Telephone = "+41 77 463 50 14"
 Email = "valerian.rousset@gmail.com"
 Citizenships = "Swiss, French"
-Github = "github.com/tharvik"

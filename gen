@@ -43,6 +43,11 @@ paragraph_styles = {
         (
             (('marginleft', '0.08in'), ('marginright', '0.08in'),
              ('marginbottom', '0.08in')),),),
+    'Urls': (
+        ('DejaVu Sans', '10pt', '#999999',
+            (),),
+        (
+            (('margintop', '0.05in'), ('marginbottom', '0.05in')),),),
     'Table header': (
         ('DejaVu Sans', '10pt', '#4c4c4c',
             (),),
@@ -73,6 +78,8 @@ paragraph_styles = {
 
 tablecolumn_styles_type = Mapping[str, str]
 tablecolumn_styles = {
+    'Table title': '2000*',
+    'Table urls': '1000*',
     'Table column key': '1000*',
     'Table column value': '4000*',
 }  # type: tablecolumn_styles_type
@@ -148,17 +155,51 @@ def add_styles(doc: OpenDocumentText) -> None:
         doc.automaticstyles.addElement(s)
 
 
-def add_header(doc: OpenDocumentText, title: str, subtitle: str) -> None:
-    subtitle = subtitle.upper()
+def get_header(doc: OpenDocumentText, config: toml_type) -> None:
+    title = config.pop('title')
+    subtitle = config.pop('subtitle').upper()  # type: ignore
+    urls = config.pop('urls')
 
-    doc.text.addElement(P(
+    table = Table()
+
+    table.addElement(TableColumn(
+        stylename=doc.getStyleByName('Table title'),
+    ))
+    table.addElement(TableColumn(
+        stylename=doc.getStyleByName('Table urls'),
+    ))
+
+    tr = TableRow()
+    table.addElement(tr)
+    tc = TableCell(
+        valuetype='string',
+        numberrowsspanned=len(urls),
+    )
+    tr.addElement(tc)
+    tc.addElement(P(
         stylename=doc.getStyleByName('Title'),
-        text=title
+        text=title,
     ))
-    doc.text.addElement(P(
+    tc.addElement(P(
         stylename=doc.getStyleByName('Subtitle'),
-        text=subtitle
+        text=subtitle,
     ))
+
+    for u in urls:
+        tr = tr or TableRow()
+        table.addElement(tr)
+
+        tc = TableCell(valuetype='string')
+        tr.addElement(tc)
+        tc.addElement(P(
+            stylename=doc.getStyleByName('Urls'),
+            text=u,
+        ))
+
+        tr = None
+
+
+    return table
 
 def get_dict_section(doc: OpenDocumentText, block: block_dict) -> Table:
     title, values = block
@@ -315,7 +356,7 @@ config = get_config()
 doc = OpenDocumentText()
 add_styles(doc)
 
-add_header(doc, config.pop('title'), config.pop('subtitle'))  # type: ignore
+doc.text.addElement(get_header(doc, config))
 
 converted = tuple(convert_config(config))
 
