@@ -1,16 +1,16 @@
 title = "Valérian Rousset"
 subtitle = "creative, logical, social"
-urls = [
-	"valerian.rousset@gmail.com",
-	"github.com/tharvik",
-	"linkedin.com/in/valerianrousset",
-]
 
 profile = """\
 	Software engineer (BSc in computer science) used to work on results-oriented projects, \
         in any programming language, \
         with focus on code quality, UNIX philosophy and standard-compliance\
 """
+
+[urls]
+"valerian.rousset@gmail.com" = "mailto:valerian.rousset@gmail.com"
+"github.com/tharvik" = "https://github.com/tharvik"
+"linkedin.com/in/valerianrousset" = "https://linkedin.com/in/valerianrousset"
 
 [competences]
 _ = [

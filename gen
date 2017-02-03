@@ -8,7 +8,7 @@ from odf.style import (
     Style, TextProperties, ParagraphProperties, TableColumnProperties,
     TableProperties
 )
-from odf.text import H, P, Span
+from odf.text import A, P, Span
 from odf.table import Table, TableColumn, TableRow, TableCell
 import sys
 import toml
@@ -185,19 +185,21 @@ def get_header(doc: OpenDocumentText, config: toml_type) -> None:
         text=subtitle,
     ))
 
-    for u in urls:
+    for text, url in urls.items():  # type: ignore
         tr = tr or TableRow()
         table.addElement(tr)
 
         tc = TableCell(valuetype='string')
         tr.addElement(tc)
-        tc.addElement(P(
-            stylename=doc.getStyleByName('Urls'),
-            text=u,
+
+        p = P(stylename=doc.getStyleByName('Urls'))
+        tc.addElement(p)
+        p.addElement(A(
+            text=text,
+            href=url,
         ))
 
         tr = None
-
 
     return table
 
