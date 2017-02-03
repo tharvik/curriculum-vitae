@@ -58,7 +58,7 @@ _ = [
 
 [contact]
 Address = "Rue du Midi 1, 1003 Lausanne, Switzerland"
-
 Telephone = "+41 77 463 50 14"
 Email = "valerian.rousset@gmail.com"
 Citizenships = "Swiss, French"
+Github = "github.com/tharvik"
