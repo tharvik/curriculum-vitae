@@ -52,13 +52,13 @@ _ = [
 "Programming languages" = """\
 	_C++_ (advanced), _C_ (advanced), \
 	_Python_ (advanced), Java (confirmed, studied at EPFL), \
-	Bash (advanced), Scala (practiced, Odersky's course : 5.5/6), \
-	JavaScript (practiced)"""
+	sh/bash (advanced), Scala (confirmed, Odersky's course : 5.5/6)
+"""
 
 [languages]
 "Mother tongue" = "_French_, C2, native speaker"
 "Foreign languages" = """\
-	_English_, B2, easy communication
+	_English_, C1, fluent communication
 	_German_, B1, understanding of basic discussions"""
 
 [contact]
