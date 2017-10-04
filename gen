@@ -89,7 +89,7 @@ FILE, = sys.argv[1:]
 
 def get_config() -> toml_type:
     with open('config.toml', encoding='UTF-8') as f:
-        config = toml.loads(f.read(), _dict=OrderedDict)
+        config = toml.loads(f.read(), _dict=OrderedDict) # type: toml_type
         return config
 
 def convert_config(config: toml_type) -> Generator[block_any, None, None]:
@@ -155,7 +155,7 @@ def add_styles(doc: OpenDocumentText) -> None:
         doc.automaticstyles.addElement(s)
 
 
-def get_header(doc: OpenDocumentText, config: toml_type) -> None:
+def get_header(doc: OpenDocumentText, config: toml_type) -> Table:
     title = config.pop('title')
     subtitle = config.pop('subtitle').upper()  # type: ignore
     urls = config.pop('urls')
