@@ -1,19 +1,15 @@
 # How to build
 
-Gentoo users, you can use my [overlay](https://github.com/tharvik/overlay) to
-have some related ebuilds.
-
 You would need
+  * `>=dev-lang/python-3.11`
   * `dev-python/odfpy`: https://pypi.python.org/pypi/odfpy
     * for python based open document generation
-  * `dev-python/toml`: https://github.com/uiri/toml
+  * `dev-python/tomlkit`: https://github.com/sdispater/tomlkit
     * for configuration loading
-  * `dev-python/typing`: https://github.com/python/typing
-    * if `<dev-lang/python-3.5`, available as standard lib in `dev-lang/python-3.6`
   * `sys-devel/tup`: http://gittup.org/tup/
     * for building
     * very good `make` replacement
-    
+
 For optional pdf generation
   * `app-office/libreoffice || app-office/libreoffice-bin`: https://www.libreoffice.org
   * `app-text/poppler`: https://poppler.freedesktop.org/
