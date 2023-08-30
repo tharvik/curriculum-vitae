@@ -1,313 +1,374 @@
 #!/usr/bin/env python3
 
-from collections import OrderedDict
-from itertools import count, zip_longest
+from collections.abc import Iterable, Mapping, Sequence
+from itertools import zip_longest
 from math import ceil
-from odf.opendocument import OpenDocumentText
+from odf.opendocument import Element, OpenDocument, OpenDocumentText
 from odf.style import (
-    Style, TextProperties, ParagraphProperties, TableColumnProperties,
-    TableProperties
+    Style,
+    TextProperties,
+    ParagraphProperties,
+    TableColumnProperties,
 )
 from odf.text import A, P, Span
 from odf.table import Table, TableColumn, TableRow, TableCell
 import sys
-import toml
+import tomlkit
+from tomlkit import TOMLDocument
+from typing import Any, TypeGuard, TypeVar
 
-from typing import Generator, Iterable, List, Mapping, MutableMapping, Optional, Tuple, Union
-toml_type = MutableMapping[str, Union[
-    str,
-    MutableMapping[str, str],
-    MutableMapping[str, List[str]]
-]]
-block_text = Tuple[str, str]
-block_list = Tuple[str, Tuple[str, ...]]
-block_dict = Tuple[str, Tuple[Tuple[str, str], ...]]
-block_any = Union[block_text, block_list, block_dict]
+T = TypeVar("T", str, Sequence[str], Mapping[str, str])
+Block = tuple[str, T]
+TextBlock = Block[str]
+ListBlock = Block[Sequence[str]]
+DictBlock = Block[Mapping[str, str]]
 
-paragraph_styles_type = Mapping[
-        str, Tuple[
-            Tuple[str, str, str,
-                Tuple[Tuple[str, str], ...]],
-            Tuple[
-                Tuple[Tuple[str, str], ...]]]
-]
+
 paragraph_styles = {
-    'Title': (
-        ('DejaVu Sans', '28pt', '#000000',
-            (('fontweight', 'bold'),),),
-        (
-            (('marginbottom', '0.08in'),),),),
-    'Subtitle': (
-        ('DejaVu Sans Light', '11pt', '#666666',
-            (('fontweight', 'bold'), ('letterspacing', '0.015in'),),),
-        (
-            (('marginleft', '0.08in'), ('marginright', '0.08in'),
-             ('marginbottom', '0.08in')),),),
-    'Urls': (
-        ('DejaVu Sans', '10pt', '#999999',
-            (),),
-        (
-            (('margintop', '0.05in'), ('marginbottom', '0.05in')),),),
-    'Table header': (
-        ('DejaVu Sans', '10pt', '#4c4c4c',
-            (),),
-        (
-            (('padding', '0.05in'), ('borderbottom', '0.06pt solid #000000'),
-             ('marginleft', '0.05in'), ('marginright', '0.05in'),
-             ('margintop', '0.1in'), ('marginbottom', '0.05in')),),),
-    'Table key': (
-        ('DejaVu Sans', '10pt', '#999999',
-            (),),
-        (
-            (('marginleft', '0.05in'), ('marginright', '0.05in'),
-             ('margintop', '0.05in'), ('marginbottom', '0.05in'),
-             ('textalign', 'end')),),),
-    'Table value': (
-        ('DejaVu Sans', '10pt', '#000000',
-            (),),
-        (
-            (('marginleft', '0.05in'), ('marginright', '0.05in'),
-             ('margintop', '0.05in'), ('marginbottom', '0.05in')),),),
-    'Table value bold': (
-        ('DejaVu Sans', '10pt', '#000000',
-            (('fontweight', 'bold'),),),
-        (
-            (('marginleft', '0.05in'), ('marginright', '0.05in'),
-             ('margintop', '0.05in'), ('marginbottom', '0.05in')),),),
-}  # type: paragraph_styles_type
+    "Title": (
+        TextProperties(
+            fontfamily="DejaVu Sans",
+            fontsize="28pt",
+            color="#000000",
+            fontweight="bold",
+        ),
+        ParagraphProperties(
+            marginbottom="0.08in",
+        ),
+    ),
+    "Subtitle": (
+        TextProperties(
+            fontfamily="DejaVu Sans Light",
+            fontsize="11pt",
+            color="#666666",
+            fontweight="bold",
+            letterspacing="0.015in",
+        ),
+        ParagraphProperties(
+            marginleft="0.08in",
+            marginright="0.08in",
+            marginbottom="0.08in",
+        ),
+    ),
+    "Urls": (
+        TextProperties(
+            fontfamily="DejaVu Sans",
+            fontsize="10pt",
+            color="#999999",
+        ),
+        ParagraphProperties(
+            margintop="0.05in",
+            marginbottom="0.05in",
+        ),
+    ),
+    "Table header": (
+        TextProperties(
+            fontfamily="DejaVu Sans",
+            fontsize="10pt",
+            color="#4c4c4c",
+        ),
+        ParagraphProperties(
+            padding="0.05in",
+            borderbottom="0.06pt solid #000000",
+            marginleft="0.05in",
+            marginright="0.05in",
+            margintop="0.1in",
+            marginbottom="0.05in",
+        ),
+    ),
+    "Table key": (
+        TextProperties(
+            fontfamily="DejaVu Sans",
+            fontsize="10pt",
+            color="#999999",
+        ),
+        ParagraphProperties(
+            marginleft="0.05in",
+            marginright="0.05in",
+            margintop="0.05in",
+            marginbottom="0.05in",
+            textalign="end",
+        ),
+    ),
+    "Table value": (
+        TextProperties(
+            fontfamily="DejaVu Sans",
+            fontsize="10pt",
+            color="#000000",
+        ),
+        ParagraphProperties(
+            marginleft="0.05in",
+            marginright="0.05in",
+            margintop="0.05in",
+            marginbottom="0.05in",
+        ),
+    ),
+    "Table value bold": (
+        TextProperties(
+            fontfamily="DejaVu Sans",
+            fontsize="10pt",
+            color="#000000",
+            fontweight="bold",
+        ),
+        ParagraphProperties(
+            marginleft="0.05in",
+            marginright="0.05in",
+            margintop="0.05in",
+            marginbottom="0.05in",
+        ),
+    ),
+}
 
-tablecolumn_styles_type = Mapping[str, str]
 tablecolumn_styles = {
-    'Table title': '2000*',
-    'Table urls': '1000*',
-    'Table column key': '1000*',
-    'Table column value': '4000*',
-}  # type: tablecolumn_styles_type
-
-FILE, = sys.argv[1:]
+    "Table title": TableColumnProperties(relcolumnwidth="2000*"),
+    "Table urls": TableColumnProperties(relcolumnwidth="1000*"),
+    "Table column key": TableColumnProperties(relcolumnwidth="1000*"),
+    "Table column value": TableColumnProperties(relcolumnwidth="4000*"),
+}
 
 
-def get_config() -> toml_type:
-    with open('config.toml', encoding='UTF-8') as f:
-        config = toml.loads(f.read(), _dict=OrderedDict) # type: toml_type
-        return config
+class InvalidConfig(Exception):
+    def __init__(self, msg: str) -> None:
+        super().__init__(f"invalid config: {msg}")
 
-def convert_config(config: toml_type) -> Generator[block_any, None, None]:
-    for k, v in config.items():
+
+class UnexpectedBlockType(InvalidConfig):
+    def __init__(self, unexpected: type) -> None:
+        super().__init__(f"unexpected block type: {unexpected}")
+
+
+(FILE,) = sys.argv[1:]
+
+
+def get_config() -> TOMLDocument:
+    with open("config.toml", encoding="UTF-8") as f:
+        return tomlkit.loads(f.read())
+
+
+def is_seq_of_str(o: Any) -> TypeGuard[Sequence[str]]:
+    return isinstance(o, Sequence) and all(isinstance(e, str) for e in o)
+
+
+def is_mapping_of_str_to_str(o: Any) -> TypeGuard[Mapping[str, str]]:
+    return isinstance(o, Mapping) and all(
+        isinstance(k, str) and isinstance(v, str) for k, v in o.items()
+    )
+
+
+def get_blocks(config: TOMLDocument) -> Iterable[Block[Any]]:
+    for block_name, v in config.unwrap().items():
         if isinstance(v, str):
-            yield k, v
-            continue
-
-        random_key = set(v.keys()).pop()
-        random_value = v[random_key]
-
-        if isinstance(random_value, list):
-            yield k, tuple(random_value)
-        elif isinstance(random_value, str):
-            yield k, tuple(v.items())  # type: ignore
-        elif isinstance(random_value, dict):
-            yield tuple((l, tuple(w)) for l, w in v.items())
+            yield block_name, v
+        elif isinstance(v, dict):
+            if len(v) == 1 and "_" in v and is_seq_of_str(v["_"]):
+                yield block_name, v["_"]
+            elif is_mapping_of_str_to_str(v):
+                yield block_name, v
+            else:
+                raise UnexpectedBlockType(type(v))
         else:
-            raise KeyError(random_value)
+            raise UnexpectedBlockType(type(v))
 
 
-def gen_styles() -> Generator[Style, None, None]:
+def gen_styles() -> Iterable[Element]:
     for name, (font, para) in paragraph_styles.items():
-        family, size, color, font_extra = font
-        para_extra, = para
-
-        s = Style(name=name, family='paragraph')
-
-        s.addElement(TextProperties(
-            fontfamily=family,
-            fontsize=size,
-            color=color,
-            **dict(font_extra)
-        ))
-
-        s.addElement(ParagraphProperties(
-            **dict(para_extra)
-        ))
-
+        s = Style(name=name, family="paragraph")
+        s.addElement(font)
+        s.addElement(para)
         yield s
 
-def gen_auto_styles() -> Generator[Style, None, None]:
-    for name, relwidth in tablecolumn_styles.items():
-        s = Style(name=name, family='table-column')
 
-        s.addElement(TableColumnProperties(
-            relcolumnwidth=relwidth,
-        ))
-
+def gen_auto_styles() -> Iterable[Element]:
+    for name, props in tablecolumn_styles.items():
+        s = Style(name=name, family="table-column")
+        s.addElement(props)
         yield s
 
     bold = Style(name="Bold", family="text")
-    bold.addElement(TextProperties(
-        fontweight="bold",
-    ))
-
+    bold.addElement(
+        TextProperties(
+            fontweight="bold",
+        )
+    )
     yield bold
 
-def add_styles(doc: OpenDocumentText) -> None:
+
+def add_styles(doc: OpenDocument) -> None:
     for s in gen_styles():
         doc.styles.addElement(s)
     for s in gen_auto_styles():
         doc.automaticstyles.addElement(s)
 
 
-def get_header(doc: OpenDocumentText, config: toml_type) -> Table:
-    title = config.pop('title')
-    subtitle = config.pop('subtitle').upper()  # type: ignore
-    urls = config.pop('urls')
+def get_header(doc: OpenDocument, config: TOMLDocument) -> Element:
+    title = config.pop("title")
+    subtitle = config.pop("subtitle").upper()
+    urls = config.pop("urls")
 
     table = Table()
 
-    table.addElement(TableColumn(
-        stylename=doc.getStyleByName('Table title'),
-    ))
-    table.addElement(TableColumn(
-        stylename=doc.getStyleByName('Table urls'),
-    ))
+    table.addElement(
+        TableColumn(
+            stylename=doc.getStyleByName("Table title"),
+        )
+    )
+    table.addElement(
+        TableColumn(
+            stylename=doc.getStyleByName("Table urls"),
+        )
+    )
 
     tr = TableRow()
     table.addElement(tr)
     tc = TableCell(
-        valuetype='string',
+        valuetype="string",
         numberrowsspanned=len(urls),
     )
     tr.addElement(tc)
-    tc.addElement(P(
-        stylename=doc.getStyleByName('Title'),
-        text=title,
-    ))
-    tc.addElement(P(
-        stylename=doc.getStyleByName('Subtitle'),
-        text=subtitle,
-    ))
+    tc.addElement(
+        P(
+            stylename=doc.getStyleByName("Title"),
+            text=title,
+        )
+    )
+    tc.addElement(
+        P(
+            stylename=doc.getStyleByName("Subtitle"),
+            text=subtitle,
+        )
+    )
 
-    for text, url in urls.items():  # type: ignore
-        tr = tr or TableRow()
+    for text, url in urls.items():
+        tr = TableRow() if tr is None else tr
         table.addElement(tr)
 
-        tc = TableCell(valuetype='string')
+        tc = TableCell(valuetype="string")
         tr.addElement(tc)
 
-        p = P(stylename=doc.getStyleByName('Urls'))
+        p = P(stylename=doc.getStyleByName("Urls"))
         tc.addElement(p)
-        p.addElement(A(
-            text=text,
-            href=url,
-        ))
+        p.addElement(
+            A(
+                text=text,
+                href=url,
+            )
+        )
 
         tr = None
 
     return table
 
-def get_dict_section(doc: OpenDocumentText, block: block_dict) -> Table:
+
+def get_dict_section(doc: OpenDocument, block: DictBlock) -> Element:
     title, values = block
 
     table = Table()
 
-    for style in 'key', 'value':
-        stylename = 'Table column ' + style
-        table.addElement(TableColumn(
-            stylename=doc.getStyleByName(stylename),
-        ))
+    for style in "key", "value":
+        stylename = "Table column " + style
+        table.addElement(
+            TableColumn(
+                stylename=doc.getStyleByName(stylename),
+            )
+        )
 
     tr = TableRow()
     table.addElement(tr)
     tc = TableCell(
-        valuetype='string',
+        valuetype="string",
         numbercolumnsspanned=2,
     )
-    tc.addElement(P(
-        stylename=doc.getStyleByName('Table header'),
-        text='+ ' + title.upper(),
-    ))
+    tc.addElement(
+        P(
+            stylename=doc.getStyleByName("Table header"),
+            text="+ " + title.upper(),
+        )
+    )
     tr.addElement(tc)
 
-    for key, value in values:
+    for key, value in values.items():
         tr = get_normal_row(doc, key, value)
         table.addElement(tr)
 
     return table
 
-def get_paragraph(doc: OpenDocumentText, style: Style, value: str) -> P:
+
+def get_paragraph(doc: OpenDocument, style: Element, value: str) -> Element:
     p = P(stylename=style)
 
     bold = False
-    for v in value.split('_'):
-        if bold:
-            boldpart = Span(
-                stylename=doc.getStyleByName('Bold'),
-                text=v,
-            )
-            p.addElement(boldpart)
-        else:
-            part = Span(
-                text=v,
-            )
-            p.addElement(part)
+    for v in value.split("_"):
+        part = Span(
+            stylename=doc.getStyleByName("Bold") if bold else None,
+            text=v,
+        )
+
+        p.addElement(part)
 
         bold = not bold
 
     return p
 
-def get_normal_row(doc: OpenDocumentText, title: str, value: str) -> TableRow:
-    tr = TableRow()
-    tc_key = TableCell(valuetype='string')
-    tc_val = TableCell(valuetype='string')
 
-    tc_key.addElement(P(
-        stylename=doc.getStyleByName('Table key'),
-        text=title,
-    ))
-    for l in value.split('\n'):
-        tc_val.addElement(get_paragraph(
-            doc,
-            doc.getStyleByName('Table value'),
-            l
-        ))
+def get_normal_row(doc: OpenDocument, title: str, value: str) -> Element:
+    tr = TableRow()
+    tc_key = TableCell(valuetype="string")
+    tc_val = TableCell(valuetype="string")
+
+    tc_key.addElement(
+        P(
+            stylename=doc.getStyleByName("Table key"),
+            text=title,
+        )
+    )
+    for line in value.split("\n"):
+        p = get_paragraph(doc, doc.getStyleByName("Table value"), line)
+        tc_val.addElement(p)
 
     tr.addElement(tc_key)
     tr.addElement(tc_val)
 
     return tr
 
-def get_list_cell(doc: OpenDocumentText, line: Optional[str]) -> TableCell:
+
+def get_list_cell(doc: OpenDocument, line: str | None) -> Element:
     tc = TableCell(
-        valuetype='string',
+        valuetype="string",
     )
 
     if line is not None:
-        tc.addElement(P(
-            stylename=doc.getStyleByName('Table value'),
-            text=line,
-        ))
+        tc.addElement(
+            P(
+                stylename=doc.getStyleByName("Table value"),
+                text=line,
+            )
+        )
 
     return tc
 
-def get_list_section(doc: OpenDocumentText, block: block_list) -> Table:
+
+def get_list_section(doc: OpenDocument, block: ListBlock) -> Element:
     title, values = block
 
     table = Table()
 
-    for i in range(2):
-        table.addElement(TableColumn(
-            stylename=doc.getStyleByName('Table value'),
-        ))
+    for _ in range(2):
+        table.addElement(
+            TableColumn(
+                stylename=doc.getStyleByName("Table value"),
+            )
+        )
 
     tr = TableRow()
     table.addElement(tr)
 
-    tc = TableCell(
-        valuetype='string',
-        numbercolumnsspanned=2
+    tc = TableCell(valuetype="string", numbercolumnsspanned=2)
+    tc.addElement(
+        P(
+            stylename=doc.getStyleByName("Table header"),
+            text="+ " + title.upper(),
+        )
     )
-    tc.addElement(P(
-        stylename=doc.getStyleByName('Table header'),
-        text='+ ' + title.upper(),
-    ))
     tr.addElement(tc)
 
     middle = ceil(len(values) / 2)
@@ -322,7 +383,8 @@ def get_list_section(doc: OpenDocumentText, block: block_list) -> Table:
 
     return table
 
-def get_text_section(doc: OpenDocumentText, block: block_text) -> Table:
+
+def get_text_section(doc: OpenDocument, block: TextBlock) -> Element:
     title, line = block
 
     table = Table()
@@ -330,12 +392,14 @@ def get_text_section(doc: OpenDocumentText, block: block_text) -> Table:
     tr = TableRow()
     table.addElement(tr)
     tc = TableCell(
-        valuetype='string',
+        valuetype="string",
     )
-    tc.addElement(P(
-        stylename=doc.getStyleByName('Table header'),
-        text='+ ' + title.upper(),
-    ))
+    tc.addElement(
+        P(
+            stylename=doc.getStyleByName("Table header"),
+            text="+ " + title.upper(),
+        )
+    )
     tr.addElement(tc)
 
     tr = TableRow()
@@ -344,14 +408,6 @@ def get_text_section(doc: OpenDocumentText, block: block_text) -> Table:
 
     return table
 
-def is_list_section(block: block_any) -> bool:
-    return isinstance(block[1], tuple) and isinstance(block[1][0], str)
-
-def is_text_section(block: block_any) -> bool:
-    return isinstance(block[1], str)
-
-def is_dict_section(block: block_any) -> bool:
-    return isinstance(block[1][0], tuple)
 
 config = get_config()
 
@@ -360,18 +416,14 @@ add_styles(doc)
 
 doc.text.addElement(get_header(doc, config))
 
-converted = tuple(convert_config(config))
-
-for block in converted:
+for block in get_blocks(config):
     table = None
-    if is_list_section(block):
-        table = get_list_section(doc, block)  # type: ignore
-    elif is_text_section(block):
-        table = get_text_section(doc, block)  # type: ignore
-    elif is_dict_section(block):
-        table = get_dict_section(doc, block)  # type: ignore
-    else:
-        raise KeyError(block)
+    if isinstance(block[1], str):
+        table = get_text_section(doc, block)
+    elif isinstance(block[1], Sequence):
+        table = get_list_section(doc, block)
+    elif isinstance(block[1], Mapping):
+        table = get_dict_section(doc, block)
 
     doc.text.addElement(table)
 
