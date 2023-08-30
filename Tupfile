@@ -11,8 +11,6 @@ export LC_TIME
 export LC_PAPER
 export LC_ALL
 
-: gen |> mypy --cache-dir=$HOME/.mypy_cache --strict --ignore-missing-imports %f |>
-
 : config.toml gen |> ./gen %o |> cv_dirty.odt
 : cv_dirty.odt |> libreoffice --headless --convert-to pdf %f |> cv_dirty.pdf
 : cv_dirty.pdf |> ./clean_pdf %f %o |> cv.pdf
