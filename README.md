@@ -1,4 +1,7 @@
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/tharvik/curriculum-vitae/main.svg)](https://results.pre-commit.ci/latest/github/tharvik/curriculum-vitae/main)
+[![Test and upload example's result](https://github.com/tharvik/curriculum-vitae/actions/workflows/test-build.yaml/badge.svg)](https://github.com/tharvik/curriculum-vitae/actions/workflows/test-build.yaml)
+
+tl;dr: download [generated cv](https://nightly.link/tharvik/curriculum-vitae/workflows/test-build.yaml/main/cv.zip).
 
 # How to build
 

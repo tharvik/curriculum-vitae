@@ -1,0 +1,39 @@
+name: Test and upload example's result
+on: push
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: install system deps
+        run: |
+          sudo apt update
+          sudo apt install libreoffice-writer pandoc poppler-utils texlive
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+          cache: pip
+      - run: pip install .
+      - run: python -m unittest
+        working-directory: tests
+
+  upload-example:
+    needs: ["tests"]
+    runs-on: ubuntu-latest
+    steps:
+      - name: install system deps
+        run: |
+          sudo apt update
+          sudo apt install libreoffice-writer poppler-utils
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+          cache: pip
+      - run: pip install .
+      - run: cv pdf --backend=libreoffice < config.toml > cv.pdf
+      - uses: actions/upload-artifact@v3
+        with:
+          name: cv
+          path: cv.pdf
