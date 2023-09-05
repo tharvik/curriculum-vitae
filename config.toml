@@ -3,8 +3,8 @@ subtitle = "creative, logical, social"
 
 profile = """\
 	Software engineer (M.Sc. in computer science), result-oriented, used to
-        fast-cycle projects, in any programming language, \
-        with focus on code quality, modularity and standards compliance\
+	fast-cycle projects, in any programming language, \
+	with focus on code quality, modularity and standards compliance\
 """
 
 [urls]
@@ -14,52 +14,49 @@ profile = """\
 
 [competences]
 _ = [
-    "Strong skills in software design and coding",
-    "Very fast understanding of concepts",
-    "Team worker as well as autonomous",
-    "Reliable and predictable",
-    "Analytical and detail-oriented",
-    "Deep understanding of computer systems",
+  "Strong skills in software design and coding",
+  "Very fast understanding of concepts",
+  "Team worker as well as autonomous",
+  "Reliable and predictable",
+  "Analytical and detail-oriented",
+  "Deep understanding of computer systems",
 ]
 
 ["professional curriculum"]
+"2019 – 2023" = """\
+	_C4DT (Center for Digital Trust)_, systems specialist; \
+	brought projects from paper to production, creating reliable and usable programs out of research; \
+	used Python, Rust, Typescript, Docker, Ansible; \
+	participated in many open-source projects\
+"""
 "2018" = """\
-        _ELCA Informatique SA_, trainee, master thesis; \
+	_ELCA Informatique SA_, trainee, master thesis; \
 	built distributed and massively scalable load tester using cloud providers to uncover performance issues; \
-        used Python, AMQP, Docker, Kubernetes\
+	used Python, AMQP, Docker, Kubernetes, Terraform\
 """
 "2016" = """\
-        _Nagravision SA (Kudelski Security)_, trainee; \
-        built vulnerability scanner aggregator to increase productivity of security specialists; \
-        used Python, Celery, Elastic, Django; wrote own open-source libraries when needed\
-"""
-"2013 – 2017" = """\
-	_EPFL (Swiss Federal Institute of Technology)_, teaching assistant for \
-        several courses, such as Software Engineering and OO Programming\
+	_Nagravision SA (Kudelski Security)_, trainee; \
+	built vulnerability scanner aggregator to increase productivity of security specialists; \
+	used Python, Celery, Elastic, Django; wrote own open-source libraries when needed\
 """
 
 ["diplomas"]
 "2016 – 2018" = """\
-        _Master_ in Computer Science, EPFL; \
-        grade: 5/6, thesis: 5.5/6\
+	_Master_ in Computer Science, EPFL; \
+	grade: 5/6, thesis: 5.5/6\
 """
 "2012 – 2016" = """\
-        _Bachelor_ in Computer Science, EPFL; \
-        grade: 5/6\
-"""
-"2008 – 2012" = """\
-        _Swiss Maturity Diploma_, Economy and Law major, \
-	Ecole Moser and Gymnase de Nyon; \
-        grade: 5/6\
+	_Bachelor_ in Computer Science, EPFL; \
+	grade: 5/6\
 """
 
 ["computer science skills"]
 "Operating systems" = "_Linux_ (Gentoo, Debian, Ubuntu)"
-"Programming languages" = """\
-	_C++_ (advanced), _C_ (advanced), \
-	_Python_ (advanced), Java (validated at EPFL), \
-	sh/bash (advanced), Scala (validated, Odersky's course: 5.5/6)\
+"Languages" = """\
+	_Rust_, _Python_, _go_, Typescript, \
+	sh/bash, Scala, C/C++\
 """
+"Technologies" = "_Docker_, _Grafana_, _Tokio_, Ansible, Angular"
 
 [languages]
 "Mother tongue" = "_French_, C2, native speaker"
@@ -69,7 +66,6 @@ _ = [
 """
 
 [contact]
-Address = "Rue du Midi 1, 1003 Lausanne, Switzerland"
+Address = "Avenue du Silo 34, 1020 Renens, Switzerland"
 Telephone = "+41 77 463 50 14"
 Email = "valerian.rousset@gmail.com"
-Citizenships = "Swiss, French"
