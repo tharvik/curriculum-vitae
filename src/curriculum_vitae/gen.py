@@ -1,148 +1,21 @@
-#!/usr/bin/env python3
+__all__ = ["gen"]
 
 from collections.abc import Iterable, Mapping, Sequence
 from itertools import zip_longest
 from math import ceil
 from odf.opendocument import Element, OpenDocument, OpenDocumentText
-from odf.style import (
-    Style,
-    TextProperties,
-    ParagraphProperties,
-    TableColumnProperties,
-)
-from odf.text import A, P, Span
 from odf.table import Table, TableColumn, TableRow, TableCell
-import sys
-import tomlkit
+from odf.text import A, P, Span
 from tomlkit import TOMLDocument
 from typing import Any, TypeGuard, TypeVar
+
+from .styles import add_styles
 
 T = TypeVar("T", str, Sequence[str], Mapping[str, str])
 Block = tuple[str, T]
 TextBlock = Block[str]
 ListBlock = Block[Sequence[str]]
 DictBlock = Block[Mapping[str, str]]
-
-
-paragraph_styles = {
-    "Title": (
-        TextProperties(
-            fontfamily="DejaVu Sans",
-            fontsize="28pt",
-            color="#000000",
-            fontweight="bold",
-        ),
-        ParagraphProperties(
-            marginbottom="0.08in",
-        ),
-    ),
-    "Subtitle": (
-        TextProperties(
-            fontfamily="DejaVu Sans Light",
-            fontsize="11pt",
-            color="#666666",
-            fontweight="bold",
-            letterspacing="0.015in",
-        ),
-        ParagraphProperties(
-            marginleft="0.08in",
-            marginright="0.08in",
-            marginbottom="0.08in",
-        ),
-    ),
-    "Urls": (
-        TextProperties(
-            fontfamily="DejaVu Sans",
-            fontsize="10pt",
-            color="#999999",
-        ),
-        ParagraphProperties(
-            margintop="0.05in",
-            marginbottom="0.05in",
-        ),
-    ),
-    "Table header": (
-        TextProperties(
-            fontfamily="DejaVu Sans",
-            fontsize="10pt",
-            color="#4c4c4c",
-        ),
-        ParagraphProperties(
-            padding="0.05in",
-            borderbottom="0.06pt solid #000000",
-            marginleft="0.05in",
-            marginright="0.05in",
-            margintop="0.1in",
-            marginbottom="0.05in",
-        ),
-    ),
-    "Table key": (
-        TextProperties(
-            fontfamily="DejaVu Sans",
-            fontsize="10pt",
-            color="#999999",
-        ),
-        ParagraphProperties(
-            marginleft="0.05in",
-            marginright="0.05in",
-            margintop="0.05in",
-            marginbottom="0.05in",
-            textalign="end",
-        ),
-    ),
-    "Table value": (
-        TextProperties(
-            fontfamily="DejaVu Sans",
-            fontsize="10pt",
-            color="#000000",
-        ),
-        ParagraphProperties(
-            marginleft="0.05in",
-            marginright="0.05in",
-            margintop="0.05in",
-            marginbottom="0.05in",
-        ),
-    ),
-    "Table value bold": (
-        TextProperties(
-            fontfamily="DejaVu Sans",
-            fontsize="10pt",
-            color="#000000",
-            fontweight="bold",
-        ),
-        ParagraphProperties(
-            marginleft="0.05in",
-            marginright="0.05in",
-            margintop="0.05in",
-            marginbottom="0.05in",
-        ),
-    ),
-}
-
-tablecolumn_styles = {
-    "Table title": TableColumnProperties(relcolumnwidth="2000*"),
-    "Table urls": TableColumnProperties(relcolumnwidth="1000*"),
-    "Table column key": TableColumnProperties(relcolumnwidth="1000*"),
-    "Table column value": TableColumnProperties(relcolumnwidth="4000*"),
-}
-
-
-class InvalidConfig(Exception):
-    def __init__(self, msg: str) -> None:
-        super().__init__(f"invalid config: {msg}")
-
-
-class UnexpectedBlockType(InvalidConfig):
-    def __init__(self, unexpected: type) -> None:
-        super().__init__(f"unexpected block type: {unexpected}")
-
-
-(FILE,) = sys.argv[1:]
-
-
-def get_config() -> TOMLDocument:
-    with open("config.toml", encoding="UTF-8") as f:
-        return tomlkit.loads(f.read())
 
 
 def is_seq_of_str(o: Any) -> TypeGuard[Sequence[str]]:
@@ -155,6 +28,11 @@ def is_mapping_of_str_to_str(o: Any) -> TypeGuard[Mapping[str, str]]:
     )
 
 
+class UnexpectedBlockType(Exception):
+    def __init__(self, name: str, unexpected: type) -> None:
+        super().__init__(f"unexpected shape of block {name}, got type {unexpected}")
+
+
 def get_blocks(config: TOMLDocument) -> Iterable[Block[Any]]:
     for block_name, v in config.unwrap().items():
         if isinstance(v, str):
@@ -165,45 +43,15 @@ def get_blocks(config: TOMLDocument) -> Iterable[Block[Any]]:
             elif is_mapping_of_str_to_str(v):
                 yield block_name, v
             else:
-                raise UnexpectedBlockType(type(v))
+                raise UnexpectedBlockType(block_name, type(v))
         else:
-            raise UnexpectedBlockType(type(v))
-
-
-def gen_styles() -> Iterable[Element]:
-    for name, (font, para) in paragraph_styles.items():
-        s = Style(name=name, family="paragraph")
-        s.addElement(font)
-        s.addElement(para)
-        yield s
-
-
-def gen_auto_styles() -> Iterable[Element]:
-    for name, props in tablecolumn_styles.items():
-        s = Style(name=name, family="table-column")
-        s.addElement(props)
-        yield s
-
-    bold = Style(name="Bold", family="text")
-    bold.addElement(
-        TextProperties(
-            fontweight="bold",
-        )
-    )
-    yield bold
-
-
-def add_styles(doc: OpenDocument) -> None:
-    for s in gen_styles():
-        doc.styles.addElement(s)
-    for s in gen_auto_styles():
-        doc.automaticstyles.addElement(s)
+            raise UnexpectedBlockType(block_name, type(v))
 
 
 def get_header(doc: OpenDocument, config: TOMLDocument) -> Element:
-    title = config.pop("title")
-    subtitle = config.pop("subtitle").upper()
-    urls = config.pop("urls")
+    title = config.pop("title", None)
+    subtitle = config.pop("subtitle").upper() if "subtitle" in config else None
+    urls = config.pop("urls", {})
 
     table = Table()
 
@@ -409,22 +257,21 @@ def get_text_section(doc: OpenDocument, block: TextBlock) -> Element:
     return table
 
 
-config = get_config()
+def gen(config: TOMLDocument) -> OpenDocument:
+    doc = OpenDocumentText()
+    add_styles(doc)
 
-doc = OpenDocumentText()
-add_styles(doc)
+    doc.text.addElement(get_header(doc, config))
 
-doc.text.addElement(get_header(doc, config))
+    for block in get_blocks(config):
+        table = None
+        if isinstance(block[1], str):
+            table = get_text_section(doc, block)
+        elif isinstance(block[1], Sequence):
+            table = get_list_section(doc, block)
+        elif isinstance(block[1], Mapping):
+            table = get_dict_section(doc, block)
 
-for block in get_blocks(config):
-    table = None
-    if isinstance(block[1], str):
-        table = get_text_section(doc, block)
-    elif isinstance(block[1], Sequence):
-        table = get_list_section(doc, block)
-    elif isinstance(block[1], Mapping):
-        table = get_dict_section(doc, block)
+        doc.text.addElement(table)
 
-    doc.text.addElement(table)
-
-doc.save(FILE)
+    return doc
