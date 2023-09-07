@@ -6,7 +6,7 @@ from io import BytesIO
 from os import PathLike
 from odf.opendocument import OpenDocument
 from pathlib import Path
-from subprocess import PIPE, CalledProcessError
+from subprocess import DEVNULL, PIPE, CalledProcessError
 import sys
 from tempfile import TemporaryDirectory
 import tomlkit
@@ -30,8 +30,8 @@ class UnableToAutoDetectBackend(Exception):
 async def with_proc(
     act: Callable[[Process], Awaitable[T]],
     *args: StrOrBytesPath,
-    stdin: int | None = None,
-    stdout: int | None = None,
+    stdin: int | None = DEVNULL,
+    stdout: int | None = DEVNULL,
 ) -> T:
     p = await create_subprocess_exec(*args, stdin=stdin, stdout=stdout)
     ret = await act(p)
@@ -124,6 +124,7 @@ async def pdf_convert_pandoc(doc: OpenDocument) -> None:
         "--from=odt",
         "--to=pdf",
         stdin=PIPE,
+        stdout=None,
     )
 
 
