@@ -8,7 +8,7 @@ profile = """\
 """
 
 [urls]
-"valerian.rousset@gmail.com" = "mailto:valerian.rousset@gmail.com"
+"valerian.rousset@proton.me" = "mailto:valerian.rousset@proton.me"
 "github.com/tharvik" = "https://github.com/tharvik"
 "linkedin.com/in/valerianrousset" = "https://linkedin.com/in/valerianrousset"
 
@@ -68,4 +68,4 @@ _ = [
 [contact]
 Address = "Avenue du Silo 34, 1020 Renens, Switzerland"
 Telephone = "+41 77 463 50 14"
-Email = "valerian.rousset@gmail.com"
+Email = "valerian.rousset@proton.me"
