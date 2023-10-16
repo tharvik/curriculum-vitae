@@ -12,12 +12,12 @@ repos:
     hooks:
       - id: prettier
   - repo: https://github.com/crate-ci/typos
-    rev: v1.16.17
+    rev: v1.16.19
     hooks:
       - id: typos
   # python
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.5.1
+    rev: v1.6.0
     hooks:
       - id: mypy
         args: [--strict, --ignore-missing-imports]
