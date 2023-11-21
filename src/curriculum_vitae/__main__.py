@@ -15,7 +15,7 @@ from typing import Literal, TypeVar
 from curriculum_vitae import generate
 
 # from typeshed
-StrOrBytesPath = PathLike | bytes | str
+StrOrBytesPath = str | bytes | PathLike[str] | PathLike[bytes]
 
 T = TypeVar("T")
 
