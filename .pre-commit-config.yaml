@@ -12,7 +12,7 @@ repos:
     hooks:
       - id: prettier
   - repo: https://github.com/crate-ci/typos
-    rev: v1.18.1
+    rev: typos-v0.10.20
     hooks:
       - id: typos
   # python
@@ -22,10 +22,10 @@ repos:
       - id: mypy
         args: [--strict, --ignore-missing-imports]
   - repo: https://github.com/psf/black
-    rev: 24.1.1
+    rev: 24.2.0
     hooks:
       - id: black
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.2.0
+    rev: v0.2.1
     hooks:
       - id: ruff
