@@ -47,10 +47,10 @@ You can also use the library directly.
 
 ```python
 import tomlkit
-from curriculum_vitae import gen
+from curriculum_vitae import generate
 
 with open("config.toml") as f:
     config = tomlkit.load(f)
-doc = gen(config)
+doc = generate(config)
 doc.write("cv.odt")
 ```
