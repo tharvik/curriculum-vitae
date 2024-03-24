@@ -23,6 +23,11 @@ _ = [
 ]
 
 ["professional curriculum"]
+"2024" = """\
+	_MLO (Machine Learning and Optimization Laboratory)_, systems specialist; \
+	structured decentralized and federated machine learning projects; \
+	used Typescript, Docker, Vue.js\
+"""
 "2019 – 2023" = """\
 	_C4DT (Center for Digital Trust)_, systems specialist; \
 	brought projects from paper to production, creating reliable and usable programs out of research; \
