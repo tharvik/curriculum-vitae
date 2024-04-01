@@ -22,3 +22,6 @@ cv = "curriculum_vitae.__main__:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.typos.default.extend-identifiers]
+odf = "odf"
