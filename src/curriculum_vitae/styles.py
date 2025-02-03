@@ -13,7 +13,7 @@ paragraph_styles = {
             fontweight="bold",
         ),
         ParagraphProperties(
-            marginbottom="0.08in",
+            marginbottom="0.05in",
         ),
     ),
     "Subtitle": (
@@ -27,7 +27,6 @@ paragraph_styles = {
         ParagraphProperties(
             marginleft="0.08in",
             marginright="0.08in",
-            marginbottom="0.08in",
         ),
     ),
     "Urls": (

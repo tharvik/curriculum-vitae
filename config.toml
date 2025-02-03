@@ -61,7 +61,7 @@ _ = [
 	_Rust_, _Python_, _go_, Typescript, \
 	sh/bash, Scala, C/C++\
 """
-"Technologies" = "_Docker_, _Grafana_, _Kubernetes_, _WebAssembly_, Terraform, Yew, Ansible, Angular"
+"Technologies" = "_Docker_, _Grafana_, _Kubernetes_, _WebAssembly_, Terraform, Mypy, Vue.js"
 
 [languages]
 "Mother tongue" = "_French_, C2, native speaker"
@@ -73,4 +73,3 @@ _ = [
 [contact]
 Address = "Avenue du Silo 34, 1020 Renens, Switzerland"
 Telephone = "+41 77 463 50 14"
-Email = "valerian.rousset@proton.me"
