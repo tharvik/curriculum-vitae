@@ -23,7 +23,12 @@ _ = [
 ]
 
 ["professional curriculum"]
-"2024" = """\
+"2025 …" = """\
+	_LiGHT (Laboratory for Intelligent Global Health Technologies)_, systems specialist; \
+	productionized medical machine learning platform; \
+	used Typescript, Python, Next.js\
+"""
+"2024 …" = """\
 	_MLO (Machine Learning and Optimization Laboratory)_, systems specialist; \
 	structured decentralized and federated machine learning projects; \
 	used Typescript, Docker, Vue.js\
@@ -46,22 +51,14 @@ _ = [
 """
 
 ["diplomas"]
-"2016 – 2018" = """\
-	_Master_ in Computer Science, EPFL; \
-	grade: 5/6, thesis: 5.5/6\
-"""
-"2012 – 2016" = """\
-	_Bachelor_ in Computer Science, EPFL; \
-	grade: 5/6\
-"""
+"2012 – 2018" = "_Bachelor_ & _Master_ in Computer Science, EPFL; grade: 5/6"
 
 ["computer science skills"]
-"Operating systems" = "_Linux_ (Gentoo, Debian, Ubuntu)"
 "Languages" = """\
-	_Rust_, _Python_, _go_, Typescript, \
+	_Rust_, _Typescript_, _go_, Python, \
 	sh/bash, Scala, C/C++\
 """
-"Technologies" = "_Docker_, _Grafana_, _Kubernetes_, _WebAssembly_, Terraform, Mypy, Vue.js"
+"Technologies" = "_Docker_, _Vue.js_, _WebAssembly_, Grafana, Kubernetes, Next.js, Terraform"
 
 [languages]
 "Mother tongue" = "_French_, C2, native speaker"
