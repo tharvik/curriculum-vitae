@@ -11,8 +11,8 @@ repos:
     rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
-  - repo: https://github.com/crate-ci/typos
-    rev: v1
+  - repo: https://github.com/adhtruong/mirrors-typos
+    rev: v1.32.0
     hooks:
       - id: typos
   # python
