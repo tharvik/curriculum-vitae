@@ -3,7 +3,6 @@ from odf.element import Element
 from odf.opendocument import OpenDocument
 from odf.style import ParagraphProperties, Style, TableColumnProperties, TextProperties
 
-
 paragraph_styles = {
     "Title": (
         TextProperties(
