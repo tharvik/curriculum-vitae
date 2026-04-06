@@ -12,20 +12,20 @@ repos:
     hooks:
       - id: prettier
   - repo: https://github.com/adhtruong/mirrors-typos
-    rev: v1.44.0
+    rev: v1.45.0
     hooks:
       - id: typos
   # python
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.19.1
+    rev: v1.20.0
     hooks:
       - id: mypy
         args: [--strict, --ignore-missing-imports]
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 26.3.0
+    rev: 26.3.1
     hooks:
       - id: black
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.5
+    rev: v0.15.9
     hooks:
       - id: ruff
